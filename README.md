@@ -1,4 +1,4 @@
-# fay
+# TrojanDotnet
 A Trojan client  implementation by .net core 
 
 
