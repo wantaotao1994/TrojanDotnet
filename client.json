@@ -1,0 +1,14 @@
+{
+   "ProxySetting": {
+     "Trojan": {
+       "Host": "host.com",
+       "Port": 443,
+       "Pass": "your pass"
+     },
+	 
+     "HttpProxPort": 8077,
+     "PacServerPort":7900 
+
+
+   }
+}
