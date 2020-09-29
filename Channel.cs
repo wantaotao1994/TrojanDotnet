@@ -77,7 +77,7 @@ namespace Winter
                             result = await stream.ReadAsync(memoryBuffer);
                             memoryStream.Write(memoryBuffer, 0, result);
                         }
-                        catch (Exception)
+                        catch (Exception)  //异常吃掉  不要学 偷懒之作 因为浏览器完成后会关闭连接 
                         {
                             this.Dispose();
 
@@ -96,7 +96,7 @@ namespace Winter
                     }
                     else
                     {
-                        //TODO:  recived  null from client
+                        //TODO:  recived  null from client  
                         this.Dispose();
 
 
@@ -134,7 +134,7 @@ namespace Winter
                     }
 
                 }
-                catch (Exception)
+                catch (Exception)////异常吃掉  不要学 偷懒之作 因为浏览器完成后会关闭连接 
                 {
                     this.Dispose();
                 }

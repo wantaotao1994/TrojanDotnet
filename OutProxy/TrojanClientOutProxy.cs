@@ -140,7 +140,7 @@ namespace Winter.OutProxy
                         i = await _sslStream.ReadAsync(data, 0, data.Length);
                         me.Write(data, 0, i);
 
-                        if (i < data.Length)
+                        if (i < data.Length) //todo : 这里有bug 如果最后的刚好是data.length的字节就会卡死- -
                         {
                             break;
                         }
