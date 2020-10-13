@@ -56,8 +56,7 @@ namespace Winter
 
         private async System.Threading.Tasks.Task BeginReccivedFromLocalAsync()
         {
-
-            byte[] memoryBuffer = new byte[512];
+            byte[] memoryBuffer = new byte[81920];
             var stream = _clientInProxy.GetStream();
 
             while (running)
