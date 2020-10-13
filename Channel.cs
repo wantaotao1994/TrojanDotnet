@@ -18,7 +18,7 @@ namespace Winter
 
         TcpClient _clientInProxy;
 
-        IClientOutProxy _clientOutProxy;
+        AbsClientOutProxy _clientOutProxy;
 
         LocalProxyStatus localProxyStatus;
 
@@ -27,7 +27,7 @@ namespace Winter
         bool running = true;
 
 
-        public Channel(TcpClient clientInProxy, IClientOutProxy clientOutProxy)
+        public Channel(TcpClient clientInProxy, AbsClientOutProxy clientOutProxy)
         {
             localProxyStatus = LocalProxyStatus.Connect;
             _clientInProxy = clientInProxy;
@@ -62,14 +62,10 @@ namespace Winter
 
             while (running)
             {
-
-
-
                 int result = 0;
                 //   var result2 = stream.Read(data2,0,248);
                 using (var memoryStream = new MemoryStream())
                 {
-
                     do
                     {
                         try
@@ -80,15 +76,9 @@ namespace Winter
                         catch (Exception)  //异常吃掉  不要学 偷懒之作 因为浏览器完成后会关闭连接 
                         {
                             this.Dispose();
-
-
                         }
-                        //numberOfBytesRead = stream.Read(myReadBuffer, 0, myReadBuffer.Length);
-                        //myCompleteMessage.AppendFormat("{0}", Encoding.ASCII.GetString(myReadBuffer, 0, numberOfBytesRead));
                     }
                     while (stream.DataAvailable && stream.CanRead);
-
-
                     memoryStream.TryGetBuffer(out var _buffer);
                     if (result > 0)
                     {
@@ -98,46 +88,25 @@ namespace Winter
                     {
                         //TODO:  recived  null from client  
                         this.Dispose();
-
-
                     }
-
-
-
                 }
-
-
-
-
             }
         }
-
-
         private async System.Threading.Tasks.Task BeginReccivedFromRemoteAsync()
         {
-
             while (running)
             {
                 try
                 {
 
-
-                    var data = await _clientOutProxy.ReadDataAsync();
-                    if (data.Length > 0)
-                    {
-                        await _clientInProxy.GetStream().WriteAsync(data);
-                    }
-                    else
-                    {
-
-                        this.Dispose();
-                    }
+                    await _clientOutProxy.ReadDataAsync(_clientInProxy.GetStream());
+                    Console.WriteLine("ddd");
 
                 }
-                catch (Exception)////异常吃掉  不要学 偷懒之作 因为浏览器完成后会关闭连接 
+                finally
                 {
                     this.Dispose();
-                }
+                } 
             }
         }
 
