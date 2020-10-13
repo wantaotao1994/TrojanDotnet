@@ -131,6 +131,12 @@ namespace Winter.OutProxy
 
         }
 
+        
+        /// <summary>
+        /// 不适用
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public override async Task<byte[]> ReadDataAsync()
         {
             byte[] data = new byte[2048];
@@ -143,11 +149,9 @@ namespace Winter.OutProxy
 
             using (var me = new MemoryStream())
             {
-                int i = -1;
-             
                 try
                 {
-                        
+                    
                     await ((SslStream)this.OutStream).CopyToAsync(me);
                 }
                 catch (Exception e)
@@ -155,12 +159,7 @@ namespace Winter.OutProxy
 
                     throw e;
                 }
-             
-              
-
                 me.TryGetBuffer(out var _buffer);
-
-       
                 return _buffer.AsMemory(0, _buffer.Count).ToArray();
             }
 
