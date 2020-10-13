@@ -14,13 +14,13 @@ using Console = Colorful.Console;
 
 namespace Winter.OutProxy
 {
-    public class TrojanClientOutProxy : IClientOutProxy
+    public class TrojanClientOutProxy : AbsClientOutProxy
     {
 
         bool _validServerCert;
         private static readonly byte[] CRLF = new byte[] { (byte)'\r', (byte)'\n' };
         bool _handshakeComplete = false;
-        private SslStream _sslStream;
+    //    private SslStream _sslStream;
         private TcpClient _tcpClient;
         string _trojanClientDomman;
         int _trojanClientPort;
@@ -29,6 +29,9 @@ namespace Winter.OutProxy
         short _targetPot;
 
         public bool _initSuccuss;
+
+        public override Stream OutStream { get; protected set; }
+
         public TrojanClientOutProxy(string pass, string server, int port = 443, bool validServerCert = false)
         {
             _validServerCert = validServerCert;
@@ -38,13 +41,13 @@ namespace Winter.OutProxy
 
         }
 
-        public async Task ConnectAsync(byte[] buffer, int offset, int size, DomainModel doman)
+        public override async Task ConnectAsync(byte[] buffer, int offset, int size, DomainModel doman)
         {
             _tcpClient = new TcpClient();
 
             await _tcpClient.ConnectAsync(_trojanClientDomman, _trojanClientPort);
-            _sslStream = new SslStream(_tcpClient.GetStream());
-            await this._sslStream.AuthenticateAsClientAsync(_trojanClientDomman);
+            OutStream = new SslStream(_tcpClient.GetStream());
+            await ((SslStream)this.OutStream).AuthenticateAsClientAsync(_trojanClientDomman);
 
             _targetHost = doman.Address;
 
@@ -71,12 +74,12 @@ namespace Winter.OutProxy
 
 
 
-        public async Task WriteDataAsync(byte[] buffer, int offset, int size)
+        public override async Task WriteDataAsync(byte[] buffer, int offset, int size)
         {
 
             if (_handshakeComplete)
             {
-                await this._sslStream.WriteAsync(buffer, offset, size);
+                await ((SslStream)this.OutStream).WriteAsync(buffer, offset, size);
             }
             else
             {
@@ -91,7 +94,7 @@ namespace Winter.OutProxy
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task WriteDataWithTrojanProtocolHead(byte[] data, int offset, int size)
+        public  async Task WriteDataWithTrojanProtocolHead(byte[] data, int offset, int size)
         {
 
             using (var stream = new MemoryStream())
@@ -110,14 +113,25 @@ namespace Winter.OutProxy
                 // it always true because we use MemoryStream(int capacity) constructor
                 stream.TryGetBuffer(out var buffer);
 
-                await this._sslStream.WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
+                await ((SslStream)this.OutStream).WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
                 _handshakeComplete = true;
            }
 
 
         }
+        public override async Task ReadDataAsync(Stream stream)
+        {
+            while (!this._initSuccuss)
+            {
+                Thread.Sleep(100);
+            }
+            
 
-        public async Task<byte[]> ReadDataAsync()
+            await this.OutStream.CopyToAsync(stream);
+
+        }
+
+        public override async Task<byte[]> ReadDataAsync()
         {
             byte[] data = new byte[2048];
 
@@ -129,29 +143,20 @@ namespace Winter.OutProxy
 
             using (var me = new MemoryStream())
             {
-
-
                 int i = -1;
-                do
+             
+                try
+                {
+                        
+                    await ((SslStream)this.OutStream).CopyToAsync(me);
+                }
+                catch (Exception e)
                 {
 
-                    try
-                    {
-                        i = await _sslStream.ReadAsync(data, 0, data.Length);
-                        me.Write(data, 0, i);
-
-                        if (i < data.Length) //todo : 这里有bug 如果最后的刚好是data.length的字节就会卡死- -
-                        {
-                            break;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-
-                        throw e;
-                    }
+                    throw e;
+                }
              
-                } while (i!=0&& _sslStream.CanRead);
+              
 
                 me.TryGetBuffer(out var _buffer);
 
@@ -164,14 +169,16 @@ namespace Winter.OutProxy
 
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-     
-            this._sslStream?.Dispose();
+
+            ((SslStream)this.OutStream)?.Dispose();
             
 
             this._tcpClient?.Dispose();
         }
+
+
 
         enum Command
         {
