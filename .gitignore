@@ -32,3 +32,4 @@ _ReSharper*/
 packages/
 .idea
 client.json
+/client.json
