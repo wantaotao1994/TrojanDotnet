@@ -12,6 +12,9 @@ namespace Winter.Model
         public int PacServerPort { get; set; }
 
 
+      
+
+
     }
 
     public class Trojan 
@@ -22,6 +25,8 @@ namespace Winter.Model
 
         public string Pass { get; set; }
 
+
+        public bool ValidServerCert { get; set; }
 
     }
 }

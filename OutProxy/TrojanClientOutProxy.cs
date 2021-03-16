@@ -47,7 +47,11 @@ namespace Winter.OutProxy
 
             await _tcpClient.ConnectAsync(_trojanClientDomman, _trojanClientPort);
             OutStream = new SslStream(_tcpClient.GetStream());
-            await ((SslStream)this.OutStream).AuthenticateAsClientAsync(_trojanClientDomman);
+
+            if (this._validServerCert)
+            {
+                await ((SslStream)this.OutStream).AuthenticateAsClientAsync(_trojanClientDomman);
+            }
 
             _targetHost = doman.Address;
 
