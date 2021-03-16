@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Winter": {
-      "commandName": "Project",
-      "commandLineArgs": "local=8000 trojan=Wan332617,@tj1.54wtt.com:443"
-    }
-  }
-}
