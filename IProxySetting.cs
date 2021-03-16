@@ -6,8 +6,5 @@
         
       void  SetGlobalProxy(string data);
 
-
-      void RemoveProxy();
-
     }
 }

@@ -52,12 +52,9 @@ namespace Winter.HostService
                     new TrojanClientOutProxy(_setting.Trojan.Pass, _setting.Trojan.Host));
                 channel.StartChannel();
             }
-
-
-
         }
 
-
+        
         static void GeneratePacFile(string port)
         {
             string pacText = File.ReadAllText("Pac/proxy-template.pac");
@@ -66,7 +63,8 @@ namespace Winter.HostService
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _proxySetting.RemoveProxy();
+            
+            
             return Task.CompletedTask;
         }
     }

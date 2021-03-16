@@ -2,14 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <PublishSingleFile>true</PublishSingleFile>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishTrimmed>true</PublishTrimmed>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-  
-  
+
   <ItemGroup>
     <None Remove="Pac\gfwlist.txt" />
   </ItemGroup>
