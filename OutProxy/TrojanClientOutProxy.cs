@@ -121,16 +121,9 @@ namespace Winter.OutProxy
                 // it always true because we use MemoryStream(int capacity) constructor
                 stream.TryGetBuffer(out var buffer);
 
-                try
-                {
-                    await ((SslStream)this.OutStream).WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
+                await ((SslStream)this.OutStream).WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
 
-                }
-                catch (Exception e)
-                {
-                    System.Console.WriteLine(e);
-                    throw;
-                }
+          
 
 
                 _handshakeComplete = true;
