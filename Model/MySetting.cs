@@ -8,9 +8,8 @@ namespace Winter.Model
     {
         public Trojan Trojan { get; set;}
 
-        public int HttpProxPort { get; set; }
+        public int HttpProxyPort { get; set; }
         public int PacServerPort { get; set; }
-
 
     }
 
@@ -21,6 +20,9 @@ namespace Winter.Model
         public short Port { get; set; }
 
         public string Pass { get; set; }
+        
+        public bool ValidServerCert { get; set; }
+
 
 
     }

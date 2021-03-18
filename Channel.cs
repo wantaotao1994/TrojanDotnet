@@ -15,6 +15,7 @@ namespace Winter
     {
         public static string HTTP_CONECTED_RES_STR = "HTTP/1.1 200 Connection Established\r\n\r\n";
         public string Id { get; } = Guid.NewGuid().ToString();
+        public static string HTTPS_PROXY_FLAG = "CONNECT";
 
         TcpClient _clientInProxy;
 
@@ -81,7 +82,7 @@ namespace Winter
                     memoryStream.TryGetBuffer(out var _buffer);
                     if (result > 0)
                     {
-                        await HandReciveDataFromClientAsync(_buffer, 0, _buffer.Count);
+                        await HandRecieveDataFromClientAsync(_buffer, 0, _buffer.Count);
                     }
                     else
                     {
@@ -110,18 +111,27 @@ namespace Winter
         }
 
 
-        private async System.Threading.Tasks.Task HandReciveDataFromClientAsync(Memory<byte> memoryBuffer, int offset, int length)
+        private async System.Threading.Tasks.Task HandRecieveDataFromClientAsync(Memory<byte> memoryBuffer, int offset, int length)
         {
-            var stram = _clientInProxy.GetStream();
+
+            var stream = _clientInProxy.GetStream();
 
             var byteData = memoryBuffer.ToArray();
-
+            string str = Encoding.UTF8.GetString(byteData);
             if (LocalProxyStatus.Connect == localProxyStatus)
             {
                 var address = SetHttpProxy(byteData);
                 await _clientOutProxy.ConnectAsync(memoryBuffer.ToArray(), offset, length, address);
                 localProxyStatus = LocalProxyStatus.Transfer;
-                await stram.WriteAsync(Encoding.UTF8.GetBytes(HTTP_CONECTED_RES_STR));
+                if (address.IsHttps)
+                {
+                    await stream.WriteAsync(Encoding.UTF8.GetBytes(HTTP_CONECTED_RES_STR));
+                }
+                else
+                {
+                    await _clientOutProxy.WriteDataAsync(memoryBuffer.ToArray(), offset, length);
+                }
+
             }
             else if (LocalProxyStatus.Transfer == localProxyStatus)
             {
@@ -135,31 +145,33 @@ namespace Winter
             string[] dataArr = str.Split("\r\n");
             string address = "";
             short port = 80;
-
-            foreach (var item in dataArr)
+            bool isHttps = false;
+            if (dataArr.Length>=2)
             {
-                string[] valueArr = item.Split(":");
-                if (valueArr.Length >= 2)
-                {
-                    if (valueArr[0] == "Host")
-                    {
-                        address = valueArr[1].Trim();
+                string[] firstLine = dataArr[0].Split(' ');
+                string[] secondLine = dataArr[1].Split(':');
 
-                        if (valueArr.Length > 2)
+                if (firstLine.Length>=2)
+                {
+                    if (firstLine[0] ==HTTPS_PROXY_FLAG)  //
+                    {
+                        isHttps = true;
+                    }
+                }
+                if (secondLine.Length >= 2)
+                {
+                    if (secondLine[0] == "Host")
+                    {
+                        address = secondLine[1].Trim();
+
+                        if (secondLine.Length > 2)
                         {
-                            port = short.Parse(valueArr[2].Trim());
+                            port = short.Parse(secondLine[2].Trim());
                         }
                     }
                 }
             }
-
-            if (string.IsNullOrEmpty(address))
-            {
-                return null;
-            }
-
-
-            return new DomainModel(address, port);
+            return new DomainModel(address, port, isHttps);
         }
 
         public void Dispose()
@@ -182,10 +194,13 @@ namespace Winter
         public short Port { get; set; }
 
 
-        public DomainModel(string address, short port)
+        public bool IsHttps { get; set; }
+
+        public DomainModel(string address, short port,bool isHttps)
         {
             Address = address;
             Port = port;
+            IsHttps = isHttps;
         }
     }
 

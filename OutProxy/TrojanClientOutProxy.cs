@@ -41,17 +41,22 @@ namespace Winter.OutProxy
 
         }
 
-        public override async Task ConnectAsync(byte[] buffer, int offset, int size, DomainModel doman)
+        public override async Task ConnectAsync(byte[] buffer, int offset, int size, DomainModel domain)
         {
             _tcpClient = new TcpClient();
 
             await _tcpClient.ConnectAsync(_trojanClientDomman, _trojanClientPort);
             OutStream = new SslStream(_tcpClient.GetStream());
-            await ((SslStream)this.OutStream).AuthenticateAsClientAsync(_trojanClientDomman);
+            
+            if (_validServerCert)
+            {
+                await ((SslStream)this.OutStream).AuthenticateAsClientAsync(_trojanClientDomman);
 
-            _targetHost = doman.Address;
+            }
 
-            _targetPot = doman.Port;
+            _targetHost = domain.Address;
+
+            _targetPot = domain.Port;
             _initSuccuss = true;
 
             Console.WriteLine("Request to connect :" + _targetHost+":"+ _targetPot,Color.Green);
@@ -79,6 +84,7 @@ namespace Winter.OutProxy
 
             if (_handshakeComplete)
             {
+                
                 await ((SslStream)this.OutStream).WriteAsync(buffer, offset, size);
             }
             else
@@ -86,6 +92,8 @@ namespace Winter.OutProxy
 
                 await WriteDataWithTrojanProtocolHead(buffer, offset, size);
             }
+
+            await this.OutStream.FlushAsync();
         }
 
 
@@ -113,7 +121,18 @@ namespace Winter.OutProxy
                 // it always true because we use MemoryStream(int capacity) constructor
                 stream.TryGetBuffer(out var buffer);
 
-                await ((SslStream)this.OutStream).WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
+                try
+                {
+                    await ((SslStream)this.OutStream).WriteAsync(buffer.Array, buffer.Offset, buffer.Count);
+
+                }
+                catch (Exception e)
+                {
+                    System.Console.WriteLine(e);
+                    throw;
+                }
+
+
                 _handshakeComplete = true;
            }
 

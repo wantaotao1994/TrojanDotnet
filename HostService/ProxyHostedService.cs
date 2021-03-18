@@ -31,7 +31,7 @@ namespace Winter.HostService
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-             GeneratePacFile(_setting.HttpProxPort.ToString());
+             GeneratePacFile(_setting.HttpProxyPort.ToString());
             _ = Task.Run(async () =>
             {
                var pacAddress = Helper.GetPacAddress(_setting.PacServerPort);
@@ -41,15 +41,15 @@ namespace Winter.HostService
             }, cancellationToken);
             _input.WaitingForUserInput();
             
-            _logger.LogInformation("Http Proxy listening at : http://127.0.0.1:" + _setting.HttpProxPort);
+            _logger.LogInformation("Http Proxy listening at : http://127.0.0.1:" + _setting.HttpProxyPort);
             _logger.LogInformation("Pac Proxy listening at : http://127.0.0.1:" + _setting.PacServerPort);
 
-            _httpProxy = new HttpProxy(_setting.HttpProxPort);
+            _httpProxy = new HttpProxy(_setting.HttpProxyPort);
             while (true)
             {
                 var client = await _httpProxy.BeginListenAsync();
                 Channel channel = new Channel(client,
-                    new TrojanClientOutProxy(_setting.Trojan.Pass, _setting.Trojan.Host));
+                    new TrojanClientOutProxy(_setting.Trojan.Pass, _setting.Trojan.Host,_setting.Trojan.Port,_setting.Trojan.ValidServerCert));
                 channel.StartChannel();
             }
         }
@@ -64,7 +64,8 @@ namespace Winter.HostService
         public Task StopAsync(CancellationToken cancellationToken)
         {
             
-            
+            Console.WriteLine("Exit Fay Proxy");
+            _proxySetting.RemoveSetting();
             return Task.CompletedTask;
         }
     }

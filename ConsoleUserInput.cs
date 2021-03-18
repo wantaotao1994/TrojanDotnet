@@ -40,7 +40,7 @@ namespace Winter
                         }
                         else if (key == '2')
                         {
-                            _proxySetting.SetGlobalProxy("127.0.0.1:" + _options.HttpProxPort);
+                            _proxySetting.SetGlobalProxy("127.0.0.1:" + _options.HttpProxyPort);
 
                             Console.WriteLine("Global Proxy set  success");
                         }

@@ -1,14 +1,13 @@
 {
    "ProxySetting": {
      "Trojan": {
-       "Host": "host.com",
+       "Host": "tj3.54wtt.com",
        "Port": 443,
-       "Pass": "your pass"
+       "Pass": "Wan332617,",
+       "ValidServerCert": true
      },
 	 
-     "HttpProxPort": 8077,
-     "PacServerPort":7900 
-
-
+     "HttpProxyPort": 8077,
+     "PacServerPort":7900
    }
 }
