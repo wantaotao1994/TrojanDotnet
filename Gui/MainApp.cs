@@ -39,10 +39,8 @@ namespace Winter.Gui
                 Height = Dim.Fill ()
             };
             _window.ColorScheme = Colors.TopLevel;
-            switch (Colors.TopLevel)
-            {
-                
-            }
+         
+            
             top.Add (_window);
 
             // Creates a menubar, the item "New" has a help menu.

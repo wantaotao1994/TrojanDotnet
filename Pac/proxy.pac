@@ -16,7 +16,8 @@ var ipv6_proxy = function(){ return nowall_proxy(); };
 var rules = [
     "|http://85.17.73.31/",
     "||agnesb.fr",
-	
+	"||github.com",
+
     "||akiba-web.com",
     "||altrec.com",
     "||angela-merkel.de",

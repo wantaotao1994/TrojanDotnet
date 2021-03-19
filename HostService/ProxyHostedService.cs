@@ -34,7 +34,7 @@ namespace Winter.HostService
 
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public  Task StartAsync(CancellationToken cancellationToken)
         {
              GeneratePacFile(_setting.HttpProxyPort.ToString());
             _ = Task.Run(async () =>

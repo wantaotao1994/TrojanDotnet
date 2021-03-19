@@ -17,7 +17,7 @@ namespace Winter
     class Program
     {
 
-        static async Task Main(string[] args) =>CreateHostBuilder(args).Build().RunAsync();
+        static async Task Main(string[] args) =>await CreateHostBuilder(args).Build().RunAsync();
         static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(configHost =>

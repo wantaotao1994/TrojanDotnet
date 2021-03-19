@@ -168,7 +168,6 @@ namespace Winter.OutProxy
                 }
                 catch (Exception e)
                 {
-
                     throw e;
                 }
                 me.TryGetBuffer(out var _buffer);
