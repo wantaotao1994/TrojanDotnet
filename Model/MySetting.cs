@@ -6,7 +6,7 @@ namespace Winter.Model
 {
     public class MySetting
     {
-        public Trojan Trojan { get; set;}
+        public List<Trojan> Trojan { get; set;}
 
         public int HttpProxyPort { get; set; }
         public int PacServerPort { get; set; }
@@ -15,6 +15,7 @@ namespace Winter.Model
 
     public class Trojan 
     {
+        public string Remark { get; set; }
         public string Host { get; set; }
 
         public short Port { get; set; }

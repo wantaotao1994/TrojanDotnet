@@ -1,8 +1,8 @@
 var direct = "__DIRECT__";
 if (direct == "__DIR" + "ECT__") direct = "DIRECT;";
 
-var wall_proxy = function(){ return "PROXY 127.0.0.1:8700"; };
-var wall_v6_proxy = function(){ return "PROXY 127.0.0.1:8700"; };
+var wall_proxy = function(){ return "PROXY 127.0.0.1:8077"; };
+var wall_v6_proxy = function(){ return "PROXY 127.0.0.1:8077"; };
 
 var nowall_proxy = function(){ return direct; };
 var ip_proxy = function(){ return nowall_proxy(); };

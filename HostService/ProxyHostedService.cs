@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
+using Winter.Gui;
 using Winter.InProxy;
 using Winter.Model;
 using Winter.OutProxy;
@@ -15,18 +15,23 @@ namespace Winter.HostService
 {
     public class ProxyHostedService : IHostedService
     {
+        private Action _action;
         private readonly ILogger _logger;
         private MySetting _setting;
-        private IUserInput _input;
         private IProxySetting _proxySetting;
         private HttpProxy _httpProxy;
-        public ProxyHostedService( ILogger<ProxyHostedService> logger, IOptions<MySetting> options, IUserInput input, IProxySetting proxySetting)
+        private TrojanContext _trojanContext;
+
+        
+        public ProxyHostedService( ILogger<ProxyHostedService> logger, IOptions<MySetting> options, IUserInput input, IProxySetting proxySetting, MainApp mainApp, TrojanContext trojanContext)
         {
             _logger = logger;
-            _input = input;
             _proxySetting = proxySetting;
+
+            _trojanContext = trojanContext;
             _setting = options.Value ?? throw  new Exception("ConfigError");
-            
+            _action = mainApp.Run;
+
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -39,19 +44,24 @@ namespace Winter.HostService
                 string[] prefixes = new string[] {pacAddress};
                 await new PacServer().SimpleListenerExampleAsync(prefixes);
             }, cancellationToken);
-            _input.WaitingForUserInput();
-            
-            _logger.LogInformation("Http Proxy listening at : http://127.0.0.1:" + _setting.HttpProxyPort);
-            _logger.LogInformation("Pac Proxy listening at : http://127.0.0.1:" + _setting.PacServerPort);
-
-            _httpProxy = new HttpProxy(_setting.HttpProxyPort);
+         
+            _ = Task.Factory.StartNew(async () =>
+            {
+                _httpProxy = new HttpProxy(_setting.HttpProxyPort);
+                while (true)
+                {
+                    var client = await _httpProxy.BeginListenAsync();
+                
+                    Channel channel = new Channel(client,
+                        new TrojanClientOutProxy(_trojanContext.GetUseTrojan().Pass, _trojanContext.GetUseTrojan().Host,_trojanContext.GetUseTrojan().Port,_trojanContext.GetUseTrojan().ValidServerCert));
+                    channel.StartChannel();
+                }
+            }, cancellationToken);
             while (true)
             {
-                var client = await _httpProxy.BeginListenAsync();
-                Channel channel = new Channel(client,
-                    new TrojanClientOutProxy(_setting.Trojan.Pass, _setting.Trojan.Host,_setting.Trojan.Port,_setting.Trojan.ValidServerCert));
-                channel.StartChannel();
+                _action.Invoke();
             }
+            
         }
 
         
