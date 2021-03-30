@@ -71,16 +71,28 @@ namespace Winter.Gui
 
             nodeList.SelectedItemChanged+= NodeListOnSelectedItemChanged;
             proxyMode.SelectedItemChanged += ProxyModeOnSelectedItemChanged;
+
+            ScrollView frameView = new ScrollView();
             
-            // Add some controls, 
+            frameView.Add( new TextView
+            {
+                Height = Dim.Fill(),
+                Width = Dim.Fill(),
+            });
+
+            
+           // Add some controls, 
             _window.Add (
+                new Label (3, 3, "Proxy Mode:"),
                 // The ones with my favorite layout system, Computed
-                new Label (3, 3, "Node List:"),
                 nodeList,
-                new Label (3, 9, "Proxy Mode:"),
+                new Label (3, 9, "Node List:"),
                 // The ones laid out like an australopithecus, with Absolute positions:
-                proxyMode
-                );
+                proxyMode,
+             
+                frameView
+                
+            );
 
             Application.Run ();
         }

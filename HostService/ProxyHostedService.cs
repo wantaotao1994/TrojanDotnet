@@ -73,8 +73,6 @@ namespace Winter.HostService
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            
-            Console.WriteLine("Exit Fay Proxy");
             _proxySetting.RemoveSetting();
             return Task.CompletedTask;
         }
