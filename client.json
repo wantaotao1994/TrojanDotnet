@@ -2,24 +2,10 @@
    "ProxySetting": {
      "Trojan": [
        {
-         "Remark": "hk",
-         "Host": "tj3.54wtt.com",
+         "Remark": "remark",
+         "Host": "yourhost.com",
          "Port": 443,
-         "Pass": "Wan332617,",
-         "ValidServerCert": true
-       },
-       {
-         "Remark": "usa",
-         "Host": "tj2.54wtt.com",
-         "Port": 443,
-         "Pass": "Wan332617,",
-         "ValidServerCert": true
-       },
-       {
-         "Remark": "jp",
-         "Host": "tj1.54wtt.com",
-         "Port": 443,
-         "Pass": "Wan332617,",
+         "Pass": "4,",
          "ValidServerCert": true
        }
      ],
